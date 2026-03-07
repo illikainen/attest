@@ -1,0 +1,34 @@
+---
+name: Pipeline
+
+on: [push, pull_request]  # yamllint disable-line rule:truthy
+
+permissions:
+  contents: read
+
+jobs:
+  pathcheck:
+    uses: illikainen/cicd/.github/workflows/pathcheck.yml@master
+    secrets: inherit
+
+  go:
+    uses: illikainen/cicd/.github/workflows/go.yml@dev
+    with:
+      targets: >-
+        linux:amd64
+        linux:arm64
+        darwin:arm64
+        windows:amd64
+    secrets: inherit
+
+  govulncheck:
+    uses: illikainen/cicd/.github/workflows/govulncheck.yml@master
+    secrets: inherit
+
+  golangci-lint:
+    uses: illikainen/cicd/.github/workflows/golangci-lint.yml@dev
+    secrets: inherit
+
+  semgrep:
+    uses: illikainen/cicd/.github/workflows/semgrep.yml@dev
+    secrets: inherit
