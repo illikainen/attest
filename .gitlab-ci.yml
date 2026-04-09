@@ -7,6 +7,7 @@ include:
     file: '/gitlab/go.yml'
     ref: 'master'
     inputs:
+      upload: true
       targets: >-
         linux:amd64
         linux:arm64
