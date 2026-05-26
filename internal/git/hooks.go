@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strings"
@@ -24,9 +25,9 @@ func Run() error {
 	}
 	hook := os.Getenv("GIT_HOOK")
 
-	dir := os.Getenv("GIT_PREFIX")
-	if dir == "" {
-		dir = "."
+	dir, err := repoDir()
+	if err != nil {
+		return err
 	}
 
 	if IsDisabled(dir) {
@@ -51,6 +52,23 @@ func Run() error {
 		return fn(dir)
 	}
 	return nil
+}
+
+func repoDir() (string, error) {
+	dir := "."
+	for _, key := range []string{"GIT_PREFIX", "GIT_DIR"} {
+		if value := os.Getenv(key); value != "" {
+			dir = value
+			break
+		}
+	}
+
+	p, err := Git(dir, "rev-parse", "--absolute-git-dir")
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Dir(strings.Trim(string(p.Stdout), " \r\n")), nil
 }
 
 func prepareCommitMsg(dir string) error {
