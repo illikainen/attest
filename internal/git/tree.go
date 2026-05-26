@@ -191,7 +191,7 @@ func VerifyTree(dir string, ref string) ([]byte, string, error) {
 	}
 
 	if tree.Len() <= 0 {
-		return nil, "", fmt.Errorf("%s: no objects to sign", ref)
+		return nil, "", fmt.Errorf("%s: no objects to verify", ref)
 	}
 
 	msg, err := tree.Encode()
@@ -200,8 +200,8 @@ func VerifyTree(dir string, ref string) ([]byte, string, error) {
 	}
 
 	for _, signer := range allowedSigners {
-		slog.Debug("verify signature", "ref", ref, "uid", signer.UID)
 		if bytes.Equal(signer.PublicKey.KeyID[:], sig.KeyID[:]) {
+			slog.Debug("verify signature", "ref", ref, "uid", signer.UID)
 			if signer.PublicKey.Verify(msg, sig) == nil {
 				slog.Debug("signature verified", "ref", ref, "uid", signer.UID)
 				return msg, signer.UID, nil
